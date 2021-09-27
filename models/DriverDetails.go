@@ -12,5 +12,5 @@ type DriverDetails struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
 	Heading   float64 `json:"heading"`
-	Status    int64   `json:"status"` // 01 => offline, 02 => online
+	Status    int64   `json:"status"` // 01 => offline, 02 => online, 03 => busy
 }

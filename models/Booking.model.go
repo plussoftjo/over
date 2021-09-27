@@ -26,6 +26,7 @@ type Booking struct {
 	TripTime        float64   `json:"tripTime" gorm:"default:0"`
 	ArriveDate      time.Time `json:"arriveDate"`
 	WaitingTime     float64   `json:"waitingTime"` // In Minute
+	DriverRate      bool      `json:"driverRate"`
 	Driver          User      `json:"driver" gorm:"foreignKey:DriverID;references:ID"`
 	User            User      `json:"rider" gorm:"foreignKey:UserID;references:ID"`
 }

@@ -114,7 +114,7 @@ func CheckIfUserHaveOrder(c *gin.Context) {
 			})
 		}
 
-		if booking.Status == 0 {
+		if booking.Status == 0 && booking.BookingType == "now" {
 			config.DB.Unscoped().Delete(&models.Booking{}, booking.ID)
 			c.JSON(200, gin.H{
 				"hasOrder": false,
@@ -274,6 +274,7 @@ func EndTrip(c *gin.Context) {
 	err := config.DB.Model(&models.Booking{}).Where("id = ?", data.BookingID).Updates(&models.Booking{
 		TripTime:    data.TripTime,
 		TripDetails: data.TripDetails,
+		DriverRate:  true,
 	}).Error
 	if err != nil {
 		c.JSON(500, gin.H{
@@ -285,5 +286,23 @@ func EndTrip(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"message": "success",
 	})
+
+}
+
+// IndexUserHistory ..
+func IndexUserHistory(c *gin.Context) {
+	ID := c.Param("id")
+	var history []models.Booking
+
+	err := config.DB.Where("user_id = ?", ID).Find(&history).Error
+	if err != nil {
+		c.JSON(500, gin.H{
+			"err":  err.Error(),
+			"code": 101,
+		})
+		return
+	}
+
+	c.JSON(200, history)
 
 }

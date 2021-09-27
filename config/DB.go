@@ -40,5 +40,9 @@ func SetupDB() {
 	database.AutoMigrate(&models.Wallet{})
 	database.AutoMigrate(&models.WalletLogs{})
 
+	database.AutoMigrate(&models.Countries{})
+	database.AutoMigrate(&models.BlockList{})
+	database.AutoMigrate(&models.UserStatus{})
+
 	DB = database
 }

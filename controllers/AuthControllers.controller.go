@@ -330,6 +330,7 @@ func AppLoginController(c *gin.Context) {
 	if err := config.DB.Preload("Roles").Where("phone = ?", login.Phone).First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
+			"code":    101,
 		})
 		return
 	}
@@ -338,6 +339,7 @@ func AppLoginController(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
+			"code":    102,
 		})
 		return
 	}

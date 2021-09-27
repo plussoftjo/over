@@ -18,6 +18,9 @@ type User struct {
 	Password     string        `json:"password"`
 	RolesID      uint          `json:"roles_id"`
 	UserType     uint          `json:"user_type"` // 01 -> User , 02 -> Supplier, 03 -> Controller
+	PhoneCode    string        `json:"phoneCode"`
+	Avatar       string        `json:"avatar"`
+	Block        int           `json:"block" gorm:"default:0"`
 	DriverDetail DriverDetails `json:"driverDetail" gorm:"foreignKey:UserID;references:ID"`
 	DriverCar    DriversCar    `json:"driverCar" gorm:"foreignKey:UserID;references:ID"`
 	Roles        Roles         `json:"roles" gorm:"foreignKey:RolesID;references:ID"`

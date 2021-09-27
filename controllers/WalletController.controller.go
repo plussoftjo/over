@@ -40,3 +40,13 @@ func UpdateWallet(c *gin.Context) {
 	})
 
 }
+
+// IndexWalletLogs ..
+func IndexWalletLogs(c *gin.Context) {
+	ID := c.Param("id")
+
+	var walletLogs []models.WalletLogs
+	config.DB.Where("user_id = ?", ID).Find(&walletLogs)
+
+	c.JSON(200, walletLogs)
+}

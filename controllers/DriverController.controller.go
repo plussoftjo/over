@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"server/config"
 	"server/models"
@@ -45,6 +46,64 @@ func GetNearbyDrivers(c *gin.Context) {
 	type LatLng struct {
 		Latitude  float64 `json:"latitude"`
 		Longitude float64 `json:"longitude"`
+		UserID    uint    `json:"userID"`
+	}
+
+	type Result struct {
+		UserID    uint    `json:"userID"`
+		ID        uint    `json:"ID"`
+		Latitude  float64 `json:"latitude"`
+		Longitude float64 `json:"longitude"`
+		Distance  float64 `json:"distance"`
+		Heading   float64 `json:"heading"`
+		Status    int64   `json:"status"`
+	}
+
+	var latLng LatLng
+	c.ShouldBindJSON(&latLng)
+
+	var BlockedDriver []uint
+	err := config.DB.Model(&models.BlockList{}).Where("rider_id = ?", latLng.UserID).Pluck("driver_id", &BlockedDriver).Error
+	if err != nil {
+		c.JSON(200, gin.H{
+			"err":  err.Error(),
+			"code": 101,
+		})
+		return
+	}
+	fmt.Println(BlockedDriver)
+
+	if len(BlockedDriver) == 0 {
+		var result []Result
+		// Select Latitude And Longitude
+		config.DB.Raw(`SELECT latitude, longitude,user_id,id,status,heading, SQRT(
+		POW(69.1 * (latitude - ?), 2) +
+		POW(69.1 * (? - longitude) * COS(latitude / 57.3), 2)) AS distance
+	FROM driver_details where status = 1  HAVING distance < 200 ORDER BY distance limit 10;`, latLng.Latitude, latLng.Longitude).Scan(&result)
+		c.JSON(200, gin.H{
+			"result": result,
+		})
+		return
+	}
+
+	var result []Result
+	// Select Latitude And Longitude
+	config.DB.Raw(`SELECT latitude, longitude,user_id,id,status,heading, SQRT(
+		POW(69.1 * (latitude - ?), 2) +
+		POW(69.1 * (? - longitude) * COS(latitude / 57.3), 2)) AS distance
+	FROM driver_details where status = 1 AND user_id NOT IN (?)  HAVING distance < 200 ORDER BY distance limit 10;`, latLng.Latitude, latLng.Longitude, BlockedDriver).Scan(&result)
+
+	c.JSON(200, gin.H{
+		"result": result,
+	})
+}
+
+// GetMainNearbyDrivers ..
+func GetMainNearbyDrivers(c *gin.Context) {
+	// LatLng
+	type LatLng struct {
+		Latitude  float64 `json:"latitude"`
+		Longitude float64 `json:"longitude"`
 	}
 
 	type Result struct {
@@ -62,10 +121,16 @@ func GetNearbyDrivers(c *gin.Context) {
 
 	var result []Result
 	// Select Latitude And Longitude
-	config.DB.Raw(`SELECT latitude, longitude,user_id,id,status,heading, SQRT(
+	err := config.DB.Raw(`SELECT latitude, longitude,user_id,id,status,heading, SQRT(
 		POW(69.1 * (latitude - ?), 2) +
 		POW(69.1 * (? - longitude) * COS(latitude / 57.3), 2)) AS distance
-	FROM driver_details HAVING distance < 200 ORDER BY distance;`, latLng.Latitude, latLng.Longitude).Scan(&result)
+	FROM driver_details where status = 1 HAVING distance < 200  ORDER BY distance limit 5;`, latLng.Latitude, latLng.Longitude).Scan(&result).Error
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
 
 	c.JSON(200, gin.H{
 		"result": result,

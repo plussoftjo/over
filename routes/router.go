@@ -73,6 +73,7 @@ func Setup() {
 	driver := r.Group("/driver")
 	driver.POST("/driverDetails/update", controllers.UpdateDriverDetails)
 	driver.POST("/nearbyDrivers", controllers.GetNearbyDrivers)
+	driver.POST("/nearbyMainDrivers", controllers.GetMainNearbyDrivers)
 	driver.GET("/getDriverRate/:id", controllers.GetDriverRate)
 	driver.POST("/changeDriverStatus", controllers.ChangeDriverStatus)
 
@@ -80,17 +81,30 @@ func Setup() {
 	rider := r.Group("/rider")
 	rider.POST("/storeRiderLocation", controllers.StoreRiderLocation)
 
+	// ---------- Countries & Cites & Areas ------------ //
+	countries := r.Group("/countries")
+	countries.POST("/store", controllers.StoreCountry)
+	countries.GET("/index", controllers.IndexCountries)
+	countries.GET("/destroy/:id", controllers.DestroyCountry)
+	countries.POST("/update", controllers.UpdateCountry)
+
 	// --------------- Application Controller ----------- //
 	application := r.Group("/application")
 	application.GET("/indexAssets", controllers.IndexAssets)
 
 	wallet := r.Group("/wallet")
 	wallet.POST("/updateWallet", controllers.UpdateWallet)
+	wallet.GET("/indexWalletLogs/:id", controllers.IndexWalletLogs)
 
 	// Booking Chat controller
 	bookingChat := r.Group("/bookingChat")
 	bookingChat.POST("/store", controllers.StoreBookingChat)
 	bookingChat.GET("/index/:id", controllers.IndexBookingChat)
+
+	// BlockController
+	blocking := r.Group("/blocking")
+	blocking.POST("/store", controllers.StoreBlock)
+
 	// ---------- Bookings Controller ------- //
 	booking := r.Group("/booking")
 	booking.POST("/storeBooking", controllers.StoreBooking)
@@ -102,6 +116,11 @@ func Setup() {
 	booking.POST("/onStartTrip", controllers.OnStartTrip)
 	booking.POST("/updateMeters", controllers.UpdateMetersInBooking)
 	booking.POST("/endTrip", controllers.EndTrip)
+	booking.GET("/history/:id", controllers.IndexUserHistory)
+
+	// UserStatus ..
+	userStatus := r.Group("/userStatus")
+	userStatus.POST("/store", controllers.StoreUserStatus)
 
 	r.GET("/ws/driver/:id", func(c *gin.Context) {
 		id := c.Param("id")
