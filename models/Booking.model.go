@@ -29,4 +29,5 @@ type Booking struct {
 	DriverRate      bool      `json:"driverRate"`
 	Driver          User      `json:"driver" gorm:"foreignKey:DriverID;references:ID"`
 	User            User      `json:"rider" gorm:"foreignKey:UserID;references:ID"`
+	Service         Services  `json:"service" gorm:"foreignKey:ServiceID;references:ID"`
 }

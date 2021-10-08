@@ -13,18 +13,20 @@ func DriverWithDetails(db *gorm.DB) *gorm.DB {
 // User ..
 type User struct {
 	gorm.Model
-	Name         string        `json:"name"`
-	Phone        string        `json:"phone" gorm:"unique"`
-	Password     string        `json:"password"`
-	RolesID      uint          `json:"roles_id"`
-	UserType     uint          `json:"user_type"` // 01 -> User , 02 -> Supplier, 03 -> Controller
-	PhoneCode    string        `json:"phoneCode"`
-	Avatar       string        `json:"avatar"`
-	Block        int           `json:"block" gorm:"default:0"`
-	DriverDetail DriverDetails `json:"driverDetail" gorm:"foreignKey:UserID;references:ID"`
-	DriverCar    DriversCar    `json:"driverCar" gorm:"foreignKey:UserID;references:ID"`
-	Roles        Roles         `json:"roles" gorm:"foreignKey:RolesID;references:ID"`
-	Wallet       Wallet        `json:"wallet" gorm:"foreignKey:UserID;references:ID"`
+	Name           string           `json:"name"`
+	Phone          string           `json:"phone" gorm:"unique"`
+	Password       string           `json:"password"`
+	RolesID        uint             `json:"roles_id"`
+	UserType       uint             `json:"user_type"` // 01 -> User , 02 -> Supplier, 03 -> Controller
+	PhoneCode      string           `json:"phoneCode"`
+	Avatar         string           `json:"avatar"`
+	Block          int              `json:"block" gorm:"default:0"`
+	RegisterStatus int              `json:"registerStatus" gorm:"default:0"` // 00 => RegisterButNoSetTheFirstDetails, 01 => OnStepOne, 02 => OnStepTow, 100 => complete, 101 => approved
+	DriverDetail   DriverDetails    `json:"driverDetails" gorm:"foreignKey:UserID;references:ID"`
+	DriverCar      DriversCar       `json:"driverCar" gorm:"foreignKey:UserID;references:ID"`
+	Roles          Roles            `json:"roles" gorm:"foreignKey:RolesID;references:ID"`
+	Wallet         Wallet           `json:"wallet" gorm:"foreignKey:UserID;references:ID"`
+	UserPromoCodes []UserPromoCodes `json:"userPromoCodes" gorm:"foreignKey:UserID;references:ID"`
 }
 
 // Login ...

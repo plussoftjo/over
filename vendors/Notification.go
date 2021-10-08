@@ -11,14 +11,17 @@ type NotificationData struct {
 	Type string
 	ID   string
 }
-
+type JsonDataType struct {
+	Type string `json:"type"`
+	Data string `json:"data"`
+}
 type NotificationMessage struct {
 	Body  string
 	Title string
-	Data  NotificationData
+	Data  JsonDataType
 }
 
-func SendNotification(tokens []expo.ExponentPushToken, message NotificationMessage, data NotificationData) {
+func SendNotification(tokens []expo.ExponentPushToken, message NotificationMessage) {
 
 	// Create a new Expo SDK client
 	client := expo.NewPushClient(nil)
@@ -28,7 +31,7 @@ func SendNotification(tokens []expo.ExponentPushToken, message NotificationMessa
 		&expo.PushMessage{
 			To:       tokens,
 			Body:     message.Body,
-			Data:     map[string]string{"type": data.Type, "id": data.ID},
+			Data:     map[string]string{"type": message.Data.Type, "data": message.Data.Data},
 			Sound:    "default",
 			Title:    message.Title,
 			Priority: expo.DefaultPriority,

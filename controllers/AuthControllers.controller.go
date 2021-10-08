@@ -111,7 +111,7 @@ func AppRegisterController(c *gin.Context) {
 		Balance: 0,
 	})
 
-	config.DB.Preload("Wallet").Where("id = ?", user.ID).First(&user)
+	config.DB.Preload("Wallet").Preload("UserPromoCodes").Where("id = ?", user.ID).First(&user)
 
 	c.JSON(http.StatusOK, gin.H{"user": user, "token": token})
 }
@@ -182,7 +182,7 @@ func AppAuth(c *gin.Context) {
 	config.DB.Where("id = ?", user.ID).First(&User)
 
 	var riderLocations []models.RiderLocations
-	config.DB.Where("user_id = ?", User.ID).Find(&riderLocations)
+	config.DB.Where("user_id = ?", User.ID).Preload("UserPromoCodes").Find(&riderLocations)
 
 	c.JSON(200, gin.H{
 		"user":           User,
@@ -308,7 +308,7 @@ func AuthAppUser(c *gin.Context) {
 	}
 
 	var User models.User
-	config.DB.Where("id = ?", user.ID).Scopes(models.DriverWithDetails).First(&User)
+	config.DB.Where("id = ?", user.ID).Preload("UserPromoCodes").Scopes(models.DriverWithDetails).First(&User)
 	var riderLocations []models.RiderLocations
 	config.DB.Where("user_id = ?", User.ID).Find(&riderLocations)
 	c.JSON(200, gin.H{
@@ -350,7 +350,7 @@ func AppLoginController(c *gin.Context) {
 	}
 
 	var User models.User
-	config.DB.Where("id = ?", user.ID).Scopes(models.DriverWithDetails).First(&User)
+	config.DB.Where("id = ?", user.ID).Preload("UserPromoCodes").Scopes(models.DriverWithDetails).First(&User)
 
 	var riderLocations []models.RiderLocations
 	config.DB.Where("user_id = ?", User.ID).Find(&riderLocations)

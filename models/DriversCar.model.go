@@ -11,6 +11,7 @@ type DriversCar struct {
 	UserID   uint   `json:"userID"`
 	CarBrand string `json:"carBrand"`
 	CarModel string `json:"carModel"`
+	CarYear  string `json:"carYear"`
 	CarColor string `json:"carColor"`
 	CarPlate string `json:"carPlate"`
 	CarImage string `json:"carImage"`

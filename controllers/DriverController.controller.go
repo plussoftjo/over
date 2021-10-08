@@ -79,7 +79,7 @@ func GetNearbyDrivers(c *gin.Context) {
 		config.DB.Raw(`SELECT latitude, longitude,user_id,id,status,heading, SQRT(
 		POW(69.1 * (latitude - ?), 2) +
 		POW(69.1 * (? - longitude) * COS(latitude / 57.3), 2)) AS distance
-	FROM driver_details where status = 1  HAVING distance < 200 ORDER BY distance limit 10;`, latLng.Latitude, latLng.Longitude).Scan(&result)
+	FROM driver_details where status = 2  HAVING distance < 200 ORDER BY distance limit 10;`, latLng.Latitude, latLng.Longitude).Scan(&result)
 		c.JSON(200, gin.H{
 			"result": result,
 		})
@@ -91,7 +91,7 @@ func GetNearbyDrivers(c *gin.Context) {
 	config.DB.Raw(`SELECT latitude, longitude,user_id,id,status,heading, SQRT(
 		POW(69.1 * (latitude - ?), 2) +
 		POW(69.1 * (? - longitude) * COS(latitude / 57.3), 2)) AS distance
-	FROM driver_details where status = 1 AND user_id NOT IN (?)  HAVING distance < 200 ORDER BY distance limit 10;`, latLng.Latitude, latLng.Longitude, BlockedDriver).Scan(&result)
+	FROM driver_details where status = 2 AND user_id NOT IN (?)  HAVING distance < 200 ORDER BY distance limit 10;`, latLng.Latitude, latLng.Longitude, BlockedDriver).Scan(&result)
 
 	c.JSON(200, gin.H{
 		"result": result,
@@ -124,7 +124,7 @@ func GetMainNearbyDrivers(c *gin.Context) {
 	err := config.DB.Raw(`SELECT latitude, longitude,user_id,id,status,heading, SQRT(
 		POW(69.1 * (latitude - ?), 2) +
 		POW(69.1 * (? - longitude) * COS(latitude / 57.3), 2)) AS distance
-	FROM driver_details where status = 1 HAVING distance < 200  ORDER BY distance limit 5;`, latLng.Latitude, latLng.Longitude).Scan(&result).Error
+	FROM driver_details where status = 2 HAVING distance < 200  ORDER BY distance limit 5;`, latLng.Latitude, latLng.Longitude).Scan(&result).Error
 	if err != nil {
 		c.JSON(500, gin.H{
 			"error": err.Error(),
@@ -179,7 +179,7 @@ func ChangeDriverStatus(c *gin.Context) {
 	c.ShouldBindJSON(&data)
 
 	// Fetch the driver details
-	err := config.DB.Model(&models.DriverDetails{}).Where("user_id = ?", data.UserID).Updates(models.DriverDetails{
+	err := config.DB.Model(&models.DriverDetails{}).Where("user_id = ?", data.UserID).Updates(&models.DriverDetails{
 		Status: data.Status,
 	}).Error
 

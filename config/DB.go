@@ -43,6 +43,11 @@ func SetupDB() {
 	database.AutoMigrate(&models.Countries{})
 	database.AutoMigrate(&models.BlockList{})
 	database.AutoMigrate(&models.UserStatus{})
+	database.AutoMigrate(&models.DriverValues{})
+
+	database.AutoMigrate(&models.NotificationTokens{})
+	database.AutoMigrate(&models.PromoCodes{})
+	database.AutoMigrate(&models.UserPromoCodes{})
 
 	DB = database
 }

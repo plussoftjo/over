@@ -23,6 +23,16 @@ func StoreBooking(c *gin.Context) {
 		return
 	}
 
+	// Before set new booking
+	// check if has notification before and remove it and set new one
+	var lastBooking int64
+	config.DB.Model(&models.Booking{}).Where("user_id = ?", bookingData.UserID).Where("status NOT IN (5,6)").Count(&lastBooking)
+	if lastBooking != 0 {
+		var lastBookingID int
+		config.DB.Model(&models.Booking{}).Where("user_id = ?", bookingData.UserID).Where("status NOT IN (5,6)").Pluck("id", &lastBookingID)
+		config.DB.Unscoped().Delete(&models.Booking{}, lastBookingID)
+	}
+
 	err := config.DB.Create(&bookingData).Error
 	if err != nil {
 		// There are error
@@ -104,7 +114,7 @@ func CheckIfUserHaveOrder(c *gin.Context) {
 		return
 	} else {
 		var booking models.Booking
-		recordError := config.DB.Where("user_id = ?", ID).Where("status NOT IN (5,6)").Preload("Driver", func(db *gorm.DB) *gorm.DB {
+		recordError := config.DB.Where("user_id = ?", ID).Where("status NOT IN (5,6)").Preload("Service").Preload("Driver", func(db *gorm.DB) *gorm.DB {
 			return db.Scopes(models.DriverWithDetails)
 		}).First(&booking).Error
 		if recordError != nil {
@@ -148,7 +158,7 @@ func CheckIfDriverHaveOrder(c *gin.Context) {
 		return
 	} else {
 		var booking models.Booking
-		recordError := config.DB.Where("driver_id = ?", ID).Where("status NOT IN (5,6)").Preload("Driver", func(db *gorm.DB) *gorm.DB {
+		recordError := config.DB.Where("driver_id = ?", ID).Where("status NOT IN (5,6)").Preload("Service").Preload("Driver", func(db *gorm.DB) *gorm.DB {
 			return db.Scopes(models.DriverWithDetails)
 		}).Preload("User").First(&booking).Error
 		if recordError != nil {
@@ -163,6 +173,25 @@ func CheckIfDriverHaveOrder(c *gin.Context) {
 		})
 		return
 	}
+}
+
+// ShowBooking ..
+func ShowBooking(c *gin.Context) {
+	ID := c.Param("id")
+	var data models.Booking
+
+	err := config.DB.Preload("Service").Preload("Driver", func(db *gorm.DB) *gorm.DB {
+		return db.Scopes(models.DriverWithDetails)
+	}).Preload("User").Where("id = ?", ID).First(&data).Error
+	if err != nil {
+		c.JSON(500, gin.H{
+			"err":  err.Error(),
+			"code": 101,
+		})
+		return
+	}
+
+	c.JSON(200, data)
 }
 
 // FinishBookingAndRateFromUser ..
@@ -185,7 +214,6 @@ func FinishBookingAndRateFromUser(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"message": "success",
 	})
-
 }
 
 // Steps
@@ -275,6 +303,7 @@ func EndTrip(c *gin.Context) {
 		TripTime:    data.TripTime,
 		TripDetails: data.TripDetails,
 		DriverRate:  true,
+		Status:      4,
 	}).Error
 	if err != nil {
 		c.JSON(500, gin.H{

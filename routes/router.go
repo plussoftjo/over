@@ -50,6 +50,13 @@ func Setup() {
 	auth.POST("/checkHasPhone", controllers.CheckIfHasPhone)
 	auth.POST("/resetPassword", controllers.ResetPassword)
 
+	// --------- DriverRegister ------- //
+	driverAuth := r.Group("/driverAuth")
+	driverAuth.POST("/register", controllers.RegisterDriver)
+	driverAuth.POST("/changeRegisterStatus", controllers.ChangeRegisterStatus)
+	driverAuth.POST("/createValue", controllers.CreateDriverValues)
+	driverAuth.POST("/createDriverCar", controllers.CreateDriverCar)
+
 	// --------- Basics ------- //
 	basics := r.Group("/basics")
 
@@ -88,9 +95,19 @@ func Setup() {
 	countries.GET("/destroy/:id", controllers.DestroyCountry)
 	countries.POST("/update", controllers.UpdateCountry)
 
+	// ---------- PromosCode ------------ //
+	promosCodes := r.Group("/promoCodes")
+	promosCodes.POST("/store", controllers.StorePromoCode)
+	promosCodes.GET("/index", controllers.IndexPromoCodes)
+	promosCodes.GET("/destroy/:id", controllers.DestroyPromoCode)
+	promosCodes.POST("/update", controllers.UpdatePromoCode)
+	promosCodes.POST("/checkPromoCode", controllers.CheckPromoCode)
+
 	// --------------- Application Controller ----------- //
 	application := r.Group("/application")
 	application.GET("/indexAssets", controllers.IndexAssets)
+	application.POST("/storeNotificationToken", controllers.StoreNotificationToken)
+	application.POST("/sendNotification", controllers.SendNotification)
 
 	wallet := r.Group("/wallet")
 	wallet.POST("/updateWallet", controllers.UpdateWallet)
@@ -117,6 +134,7 @@ func Setup() {
 	booking.POST("/updateMeters", controllers.UpdateMetersInBooking)
 	booking.POST("/endTrip", controllers.EndTrip)
 	booking.GET("/history/:id", controllers.IndexUserHistory)
+	booking.GET("/showBooking/:id", controllers.ShowBooking)
 
 	// UserStatus ..
 	userStatus := r.Group("/userStatus")
