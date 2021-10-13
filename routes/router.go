@@ -103,6 +103,13 @@ func Setup() {
 	promosCodes.POST("/update", controllers.UpdatePromoCode)
 	promosCodes.POST("/checkPromoCode", controllers.CheckPromoCode)
 
+	// ---------- Services ------------ //
+	services := r.Group("/services")
+	services.POST("/store", controllers.StoreService)
+	services.GET("/index", controllers.IndexServices)
+	services.GET("/destroy/:id", controllers.DestroyService)
+	services.POST("/update", controllers.UpdateService)
+
 	// --------------- Application Controller ----------- //
 	application := r.Group("/application")
 	application.GET("/indexAssets", controllers.IndexAssets)
@@ -139,6 +146,26 @@ func Setup() {
 	// UserStatus ..
 	userStatus := r.Group("/userStatus")
 	userStatus.POST("/store", controllers.StoreUserStatus)
+
+	// --------------- Dashboard Controller ----------- //
+
+	// --------------- Drivers Controller ----------- //
+	driversDashboard := r.Group("/driversDashboard")
+	driversDashboard.GET("/indexDrivers/:type", controllers.IndexDrivers)
+	driversDashboard.POST("/toggleUserBlock", controllers.ToggleUserBlock)
+	driversDashboard.GET("/showDriver/:id", controllers.ShowDriver)
+	driversDashboard.GET("/approveDriverRegister/:id", controllers.ApproveDriverRegister)
+	driversDashboard.GET("/cancelDriverRegister/:id", controllers.CancelDriverRegister)
+
+	// --------------- Drivers Controller ----------- //
+	bookingsDashboard := r.Group("/bookingDashboard")
+	bookingsDashboard.GET("/IndexBooking/:type", controllers.IndexBooking)
+	bookingsDashboard.GET("/showBooking/:id", controllers.ShowBookingDashboard)
+
+	// Dashboard
+	dashboard := r.Group("/dashboard")
+	dashboard.GET("/indexAllClients", controllers.IndexAllClients)
+	dashboard.GET("/showUser/:id", controllers.ShowUser)
 
 	r.GET("/ws/driver/:id", func(c *gin.Context) {
 		id := c.Param("id")

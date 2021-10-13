@@ -169,3 +169,48 @@ func UpdateEmployee(c *gin.Context) {
 		"users": users,
 	})
 }
+
+// IndexAllClients ..
+func IndexAllClients(c *gin.Context) {
+	var users []models.User
+
+	err := config.DB.Where("user_type = ?", 1).Find(&users).Error
+	if err != nil {
+		c.JSON(500, gin.H{
+			"err":  err.Error(),
+			"code": 101,
+		})
+		return
+	}
+
+	c.JSON(200, users)
+}
+
+// ShowUser ..
+func ShowUser(c *gin.Context) {
+	ID := c.Param("id")
+	var user models.User
+	err := config.DB.Where("id = ?", ID).Preload("Wallet").Preload("WalletLogs").First(&user).Error
+	if err != nil {
+		c.JSON(500, gin.H{
+			"err":  err.Error(),
+			"code": 101,
+		})
+		return
+	}
+
+	var orders []models.Booking
+	err = config.DB.Where("user_id = ?", ID).Scopes(models.BookingWithDetailsDashboard).Find(&orders).Error
+	if err != nil {
+		c.JSON(500, gin.H{
+			"err":  err.Error(),
+			"code": 101,
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"user":   user,
+		"orders": orders,
+	})
+}

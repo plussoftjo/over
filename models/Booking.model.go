@@ -7,6 +7,16 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// BookingWithDetails ..
+func BookingWithDetails(db *gorm.DB) *gorm.DB {
+	return db.Preload("User").Preload("Service")
+}
+
+// BookingWithDetailsDashboard ..
+func BookingWithDetailsDashboard(db *gorm.DB) *gorm.DB {
+	return db.Preload("User").Preload("Service").Preload("Driver")
+}
+
 // Booking ..
 type Booking struct {
 	gorm.Model
